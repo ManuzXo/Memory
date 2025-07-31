@@ -24,7 +24,7 @@ void RenderInit() {
 void RenderSetWindowState() {
 	SetTraceLogLevel(LOG_NONE);
 	InitWindow(800, 800, "Memory Game!");
-	
+
 	unsigned int flags = FLAG_WINDOW_RESIZABLE;
 	if (vRenderFullscreen == true) flags |= FLAG_FULLSCREEN_MODE;
 	SetWindowState(flags);
@@ -42,6 +42,7 @@ void RenderLoop() {
 		RenderBlocks();
 		RenderInfo();
 		SetMouseCursor(vRenderMouseCursor);
+		
 		EndDrawing();
 	}
 }
@@ -128,9 +129,15 @@ bool RenderMouseIsHoverBlock(GridBlock_t* block) {
 }
 
 void RenderInfo() {
-	char infoTxt[100];
-	sprintf(infoTxt, "FPS (%d) | Grid Size (%ix%i)", GetFPS(), SceneMaxRow, SceneMaxCol);
-	DrawText(infoTxt, 15, 15, 20, BLACK);
+	static float slider = 0;
+
+	int base = GetScreenWidth() > GetScreenHeight() ? GetScreenWidth() : GetScreenHeight();
+	int fontSize = (int)(base * 0.015f);
+	
+	char *infoTxt = TextFormat("FPS (%d) | Grid Size (%ix%i)", GetFPS(), SceneMaxRow, SceneMaxCol);
+	DrawText(infoTxt, 15, 15, fontSize, BLACK);
+
+	GuiSliderBar((Rectangle) { 15 + MeasureText(infoTxt, fontSize) + 20, 15, 200, fontSize + 10 }, "", NULL, & slider, 0, 100);
 }
 
 void RenderClear() {
