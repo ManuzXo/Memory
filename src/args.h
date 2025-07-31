@@ -4,6 +4,8 @@
 // -- METHOD --
 extern void Args_PrintCallback(char *unused);
 extern void Args_SetMonitor(char* p1);
+extern void Args_SetFullscreen(char* p1);
+extern void Args_SetFps(char* p1);
 
 // -- DATA STRUCTURE --
 typedef void(*ArgsMethod_t)(char *p1);

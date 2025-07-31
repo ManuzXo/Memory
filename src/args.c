@@ -16,9 +16,24 @@ void Args_SetMonitor(char* p1) {
 	else
 		printf("Valore invalido: %s. Non deve essere un integer negativo.\n", p1);
 }
+
+void Args_SetFullscreen(char* p1){
+	vRenderFullscreen = true;
+}
+
+void Args_SetFps(char* p1) {
+	int value = atoi(p1);
+	if (value > 0)
+		vRenderFps = value;
+	else
+		printf("Valore invalido: %s. Non deve essere un integer negativo o zero.\n", p1);
+}
+
 ArgsTable_t ArgsTable[] = {
 	 {"-h", "Stampa tutti i comandi disponibili", Args_PrintCallback},
-	 {"-m", "Imposta il monitor per raylib", Args_SetMonitor},
+	 {"-m", "Imposta il monitor per raylib 0(primary monitor) 1(secondary monitor) ecc...", Args_SetMonitor},
+	 {"-f", "Imposta il monitor a fullscreen", Args_SetFullscreen},
+	 {"-fps", "Imposta gli fps per raylib", Args_SetFps},
 };
 
 bool Args_Init(int argc, char* argv[]) {

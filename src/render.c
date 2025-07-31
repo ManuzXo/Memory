@@ -3,18 +3,26 @@
 #include "render.h"
 
 unsigned int vRenderMonitor = 0;
+unsigned int vRenderFps = 60;
+bool vRenderFullscreen = false;
 
 void RenderInit() {
 	InitWindow(800, 800, "Basic Window");
-	SetWindowState(FLAG_WINDOW_RESIZABLE);
-	
-	if (vRenderMonitor <= GetMonitorCount())
-		SetWindowMonitor(vRenderMonitor);
 
-	SetTargetFPS(60);
+	RenderSetWindowState();
 
 	RenderLoop();
 	RenderClear();
+}
+void RenderSetWindowState() {
+	unsigned int flags = FLAG_WINDOW_RESIZABLE;
+	if (vRenderFullscreen == true) flags |= FLAG_FULLSCREEN_MODE;
+	SetWindowState(flags);
+
+	if (vRenderMonitor <= GetMonitorCount())
+		SetWindowMonitor(vRenderMonitor);
+	
+	SetTargetFPS(vRenderFps);
 }
 void RenderLoop() {
 	while (!WindowShouldClose())
