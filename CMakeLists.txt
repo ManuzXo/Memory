@@ -29,7 +29,12 @@ set(LIB_DIR "${CMAKE_SOURCE_DIR}/lib/${LIB_OS_DIR}/${ARCH_DIR}")
 
 include_directories("${INCLUDE_DIR}")
 
-add_executable(memory src/main.c)
+file(GLOB SRC_FILES "${CMAKE_SOURCE_DIR}/src/*.c")
+file(GLOB HEADER_FILES "${CMAKE_SOURCE_DIR}/src/*.h")
+
+add_executable(memory ${SRC_FILES} ${HEADER_FILES})
+
+source_group("Header Files" FILES ${HEADER_FILES})
 
 target_link_directories(memory PRIVATE "${LIB_DIR}")
 
