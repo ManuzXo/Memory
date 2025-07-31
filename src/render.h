@@ -12,10 +12,9 @@ extern void RenderSetWindowState();
 //Main Loop
 extern void RenderLoop();
 //Fa il draw della griglia, ed gridCount è riga e colonna
-extern void RenderGrids(int gridCount);
+extern void RenderGrids(int maxRow, int maxCol);
 //Fa il draw di informazioni generali come FPS
 extern void RenderInfo();
 //Pulisce il render, chiude la finestra e rilascia le risorse
 extern void RenderClear();
-extern inline int RenderGetScaleBlock(float scale, int minSize, int maxSize);
 #endif // !_RENDER_

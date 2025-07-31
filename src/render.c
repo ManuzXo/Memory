@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "raylib/raylib.h"
+#include "scene.h"
 #include "render.h"
 
 #define BACKGROUND_COLOR RAYWHITE
@@ -9,7 +10,7 @@ unsigned int vRenderFps = 60;
 bool vRenderFullscreen = false;
 
 void RenderInit() {
-	InitWindow(800, 800, "Basic Window");
+	InitWindow(800, 800, "Memory Game!");
 	RenderSetWindowState();
 
 	RenderLoop();
@@ -31,49 +32,63 @@ void RenderLoop() {
 		BeginDrawing();
 		ClearBackground(BACKGROUND_COLOR);
 
-		RenderGrids(3);
+		RenderGrids(SceneMaxRow, SceneMaxCol);
 		RenderInfo();
 
 		EndDrawing();
 	}
 }
-void RenderGrids(int gridCount) {
-	const int blockWidth = RenderGetScaleBlock(0.2f, 10, 200);
-	const int blockHeight = RenderGetScaleBlock(0.2f, 10, 200);
-	const int spacing = 5;
+void RenderGrids(int maxRow, int maxCol) {
+	const float paddingRatio = 0.30f;  // 30% total padding (15% per lato)
+	const float spacingRatio = 0.01f;  // 1% dello schermo come spacing
 
-	int totalWidth = gridCount * blockWidth + (gridCount - 1) * spacing;
-	int totalHeight = gridCount * blockHeight + (gridCount - 1) * spacing;
+	int screenWidth = GetScreenWidth();
+	int screenHeight = GetScreenHeight();
 
-	int xSpace = (GetScreenWidth() - totalWidth) / 2;
-	int ySpace = (GetScreenHeight() - totalHeight) / 2;
+	int paddingX = screenWidth * paddingRatio / 2;
+	int paddingY = screenHeight * paddingRatio / 2;
 
-	for (int i = 0; i < gridCount; i++) {
-		for (int j = 0; j < gridCount; j++) {
-			int x = xSpace + j * (blockWidth + spacing);
-			int y = ySpace + i * (blockHeight + spacing);
+	int availableWidth = screenWidth - 2 * paddingX;
+	int availableHeight = screenHeight - 2 * paddingY;
+
+	// Calcola spacing proporzionale allo schermo
+	int spacing = screenWidth * spacingRatio;
+
+	// Calcola dimensione dinamica blocchi
+	int blockWidth = (availableWidth - (maxRow - 1) * spacing) / maxRow;
+	int blockHeight = (availableHeight - (maxCol - 1) * spacing) / maxCol;
+
+	// Coord di partenza (già centrate con padding)
+	int startX = paddingX;
+	int startY = paddingY;
+
+	int blockIndex = 0;
+	// Disegna griglia
+	for (int row = 0; row < maxRow; row++) {
+		for (int col = 0; col < maxCol; col++) {
+			int x = startX + col * (blockWidth + spacing);
+			int y = startY + row * (blockHeight + spacing);
+			
+			if (blockIndex >= SceneBlockCount) {
+				printf("Non ci sono più blocchi da disegnare\n");
+				return;
+			}
+			GridBlock_t* currentBlock = &SceneBlocks[blockIndex];
+			currentBlock->x = x;
+			currentBlock->y = x;
 			DrawRectangle(x, y, blockWidth, blockHeight, GRAY);
+
+			blockIndex++;
 		}
 	}
 }
 
 void RenderInfo() {
-	char fpsTxt[100];
-	int posX = 20;
-	int posY = 20;
-	sprintf(fpsTxt, "FPS: %d", GetFPS());
-	DrawText(fpsTxt, posX, posY, 20, BLACK);
+	char infoTxt[100];
+	sprintf(infoTxt, "FPS (%d) | Grid Size (%ix%i)", GetFPS(), SceneMaxRow, SceneMaxCol);
+	DrawText(infoTxt, 15, 15, 20, BLACK);
 }
 
 void RenderClear() {
 	CloseWindow();
-}
-
-inline int RenderGetScaleBlock(float scale, int minSize, int maxSize) {
-	int base = (GetScreenWidth() < GetScreenHeight()) ? GetScreenWidth() : GetScreenHeight();
-
-	int size = (int)(base * scale);
-	if (size < minSize) size = minSize;
-	if (size > maxSize) size = maxSize;
-	return size;
 }

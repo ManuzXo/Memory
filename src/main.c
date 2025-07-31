@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "args.h"
-#include "render.h"
+#include "scene.h"
 int main(int argc, char*argv[]) {
 	Args_Init(argc, argv);
-	RenderInit();
+	SceneInit(2, 2);
 	return 0;
 }
