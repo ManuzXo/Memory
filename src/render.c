@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include "raylib/raylib.h"
+#define RAYGUI_IMPLEMENTATION
+#include "raylib/raygui.h"
+
 #include "scene.h"
 #include "render.h"
 
@@ -14,19 +17,18 @@ bool vRenderExit = false;
 MouseCursor vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
 
 void RenderInit() {
-	InitWindow(800, 800, "Memory Game!");
 	RenderSetWindowState();
 	RenderLoop();
 	RenderClear();
 }
 void RenderSetWindowState() {
+	SetTraceLogLevel(LOG_NONE);
+	InitWindow(800, 800, "Memory Game!");
+	
 	unsigned int flags = FLAG_WINDOW_RESIZABLE;
 	if (vRenderFullscreen == true) flags |= FLAG_FULLSCREEN_MODE;
-
 	SetWindowState(flags);
-
 	if (vRenderMonitor <= GetMonitorCount()) SetWindowMonitor(vRenderMonitor);
-
 	SetTargetFPS(vRenderFps);
 }
 void RenderLoop() {
@@ -40,7 +42,6 @@ void RenderLoop() {
 		RenderBlocks();
 		RenderInfo();
 		SetMouseCursor(vRenderMouseCursor);
-
 		EndDrawing();
 	}
 }
