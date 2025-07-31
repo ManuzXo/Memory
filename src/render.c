@@ -34,17 +34,17 @@ void RenderLoop() {
 	{
 		BeginDrawing();
 		ClearBackground(BACKGROUND_COLOR);
-		
+
 		vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
-		RenderGrids(SceneMaxRow, SceneMaxCol);
+		RenderUpdateBlocksGrids(SceneMaxRow, SceneMaxCol);
+		RenderBlocks();
 		RenderInfo();
 		SetMouseCursor(vRenderMouseCursor);
-		
+
 		EndDrawing();
 	}
 }
-void RenderGrids(int maxRow, int maxCol) {
-
+void RenderUpdateBlocksGrids(int maxRow, int maxCol) {
 	int screenWidth = GetScreenWidth();
 	int screenHeight = GetScreenHeight();
 
@@ -76,40 +76,53 @@ void RenderGrids(int maxRow, int maxCol) {
 				printf("l'index block locale (%i) supera i blocchi totali (%i)\n", blockIndex, SceneBlockCount);
 				return;
 			}
-			int* currentBlock = &SceneBlocks[blockIndex];
+			GridBlock_t* currentBlock = &SceneGridBlocks[blockIndex];
 			if (currentBlock == NULL) {
 				printf("Il blocco corrente è NULL, index: %i\n", blockIndex);
 				return;
 			}
-			RenderBlock(*currentBlock, xBlock, yBlock, blockWidth, blockHeight);
+			currentBlock->x = xBlock;
+			currentBlock->y = yBlock;
+			currentBlock->width = blockWidth;
+			currentBlock->height = blockHeight;
 			blockIndex++;
 		}
 	}
 }
+void RenderBlocks() {
+	for (int i = 0; i < SceneBlockCount; i++) {
+		GridBlock_t* currentBlock = &SceneGridBlocks[i];
+		if (currentBlock == NULL) {
+			printf("Il blocco corrente è NULL, index: %i\n", i);
+			return;
+		}
+		RenderBlock(currentBlock);
+	}
+}
 
-void RenderBlock(int blockNumber, int xBlock, int yBlock, int blockWidth, int blockHeight) {
-	DrawRectangle(xBlock, yBlock, blockWidth, blockHeight, GRAY);
-	if (RenderMouseIsHoverBlock(xBlock, yBlock, blockWidth, blockHeight)) {
+void RenderBlock(GridBlock_t* block) {
+	DrawRectangle(block->x, block->y, block->width, block->height, GRAY);
+	if (RenderMouseIsHoverBlock(block)) {
 		if (vRenderMouseCursor == MOUSE_CURSOR_DEFAULT) {
 			vRenderMouseCursor = MOUSE_CURSOR_POINTING_HAND;
 		}
-		RenderDrawBlockNumber(blockNumber, xBlock, yBlock, blockWidth, blockHeight);
+		RenderDrawBlockNumber(block);
 	}
 }
-void RenderDrawBlockNumber(int blockNumber, int xBlock, int yBlock, int blockWidth, int blockHeight) {
-	char* numberText = TextFormat("%i", blockNumber);
+
+void RenderDrawBlockNumber(GridBlock_t* block) {
+	char* numberText = TextFormat("%i", block->number);
 	int textWidth = MeasureText(numberText, 20);
-	int xText = xBlock + blockWidth / 2 - textWidth;
-	int yText = yBlock + blockHeight / 2 - textWidth;
+	int xText = block->x + block->width / 2 - textWidth;
+	int yText = block->y + block->height / 2 - textWidth;
 	DrawText(numberText, xText, yText, 20, BLACK);
 }
-
-bool RenderMouseIsHoverBlock(int xBlock, int yBlock, int blockWidth, int blockHeight) {
+bool RenderMouseIsHoverBlock(GridBlock_t* block) {
 	Vector2 mousePos = GetMousePosition();
-	int leftX = xBlock;
-	int rightX = xBlock + blockWidth;
-	int topY = yBlock;
-	int bottomY = yBlock + blockHeight;
+	int leftX = block->x;
+	int rightX = block->x + block->width;
+	int topY = block->y;
+	int bottomY = block->y + block->height;
 	return mousePos.x >= leftX && mousePos.x <= rightX && mousePos.y >= topY && mousePos.y <= bottomY;
 }
 
