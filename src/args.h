@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _ARGS_
+#define _ARGS_
 #include <stdbool.h>
 
 // -- METHOD --
@@ -19,3 +21,5 @@ extern ArgsTable_t ArgsTable[];
 // -- FN --
 extern bool Args_Init(int argc, char*argv[]);
 extern void Args_Print();
+
+#endif // ! _ARGS_

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _RENDER_
 #define _RENDER_
 #include <stdbool.h>
