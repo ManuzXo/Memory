@@ -1,9 +1,16 @@
 #include <stdio.h>
 #include "raylib/raylib.h"
 #include "render.h"
+
+unsigned int vRenderMonitor = 0;
+
 void RenderInit() {
 	InitWindow(800, 800, "Basic Window");
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
+	
+	if (vRenderMonitor <= GetMonitorCount())
+		SetWindowMonitor(vRenderMonitor);
+
 	SetTargetFPS(60);
 
 	RenderLoop();
