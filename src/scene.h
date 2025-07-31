@@ -4,11 +4,18 @@
 #include <stdbool.h>
 #include "struct.h"
 
-extern GridBlock_t *SceneBlocks;
+//Array di numeri che rappresentano i blocchi della scena
+extern int *SceneBlocks;
 extern unsigned int SceneBlockCount;
 extern unsigned int SceneMaxRow, SceneMaxCol;
 
+// Inizializza la scena con il numero di righe e colonne
 extern void SceneInit(unsigned int maxRow, unsigned int maxCol);
-extern bool SceneAddBlock(int x, int y, Color color);
+// Scambia due blocchi nella scena
+extern void SwapBlocks(int* a, int* b);
+// Crea coppie di blocchi e li mescola
+extern bool SceneCreatePairsAndShuffle();
+// Pulisce i blocchi della scena, liberando la memoria
 extern void SceneClearBlocks();
+
 #endif // !_SCENE_

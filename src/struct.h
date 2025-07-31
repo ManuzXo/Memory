@@ -4,6 +4,6 @@
 #include "raylib/raylib.h"
 typedef struct {
 	int x, y;
-	Color color;
+	int number;
 }GridBlock_t;
 #endif // !_STRUCT_

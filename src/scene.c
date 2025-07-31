@@ -1,41 +1,52 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+
 #include "scene.h"
 #include "render.h"
 
-GridBlock_t* SceneBlocks = NULL;
+int* SceneBlocks = NULL;
 unsigned int SceneBlockCount = 0;
 unsigned int SceneMaxRow = 0, SceneMaxCol = 0;
 
 void SceneInit(unsigned int maxRow, unsigned int maxCol) {
-	SceneClearBlocks();
-
+    SceneClearBlocks();
 	SceneMaxRow = maxRow;
 	SceneMaxCol = maxCol;
-	printf("SceneInit maxRow(%d) & maxCol(%d)\n", maxRow, maxCol);
-	for (int i = 0; i < maxRow; i++) {
-		for (int j = 0; j < maxCol; j++) {
-			if (!SceneAddBlock(0, 0, RED))
-				return;
-		}
+	SceneBlockCount = SceneMaxRow * SceneMaxCol;
+	if (SceneBlockCount % 2 != 0) {
+		printf("Attenzione: la griglia non ha un numero pari di blocchi\n");
+		return;
 	}
-	printf("SceneBlockCount %i\n", SceneBlockCount);
-
-	RenderInit();
-	SceneClearBlocks();
+    SceneCreatePairsAndShuffle();
 }
-bool SceneAddBlock(int x, int y, Color color) {
-	SceneBlocks = (GridBlock_t*)realloc(SceneBlocks, sizeof(GridBlock_t) * (SceneBlockCount + 1));
-	if (SceneBlocks == NULL) {
-		printf("Allocazione della memoria non riuscita per il blocco\n");
-		return false;
-	}
-	SceneBlockCount++;
-	GridBlock_t* lastBlock = &SceneBlocks[SceneBlockCount - 1];
-	lastBlock->x = x;
-	lastBlock->y = y;
-	lastBlock->color = color;
-	return true;
+void SwapBlocks(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+bool SceneCreatePairsAndShuffle() {
+    SceneBlocks = realloc(SceneBlocks, sizeof(int) * SceneBlockCount);
+    if (SceneBlocks == NULL) {
+        printf("Memoria insufficiente per allocare i blocchi\n");
+        SceneBlockCount = 0;
+        return false;
+    }
+
+    for (unsigned int i = 0; i < SceneBlockCount / 2; i++) {
+        SceneBlocks[i * 2] = i;
+        SceneBlocks[i * 2 + 1] = i;
+    }
+
+    srand((unsigned int)time(NULL));
+
+    // Fisher-Yates shuffle
+    for (int i = SceneBlockCount - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        SwapBlocks(&SceneBlocks[i], &SceneBlocks[j]);
+    }
+    return true;
 }
 
 void SceneClearBlocks() {
@@ -43,4 +54,5 @@ void SceneClearBlocks() {
 
 	printf("Clearing %u blocks\n", SceneBlockCount);
 	free(SceneBlocks);
+    SceneBlockCount = 0;
 }
