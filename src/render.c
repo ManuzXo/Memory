@@ -9,7 +9,8 @@
 #define BACKGROUND_COLOR RAYWHITE
 #define PADDING_RATIO 0.30f  // 30% padding totale (15% per lato)
 #define SPACING_RATIO 0.01f  // 1% dello schermo come spacing
-#define TICK_ANIMATION 30  // 30 tick per l'animazione di ripristino
+#define TICK_ANIMATION_SECONDS .5f
+#define TICK_ANIMATION_FRAME (int)(TICK_ANIMATION_SECONDS * vRenderFps)
 
 
 unsigned int vRenderMonitor = 0;
@@ -151,7 +152,7 @@ void RenderCheckResultBlocks() {
 		}
 		else if (!vRenderStartAnimation)
 		{
-			vRenderTickAnimation = TICK_ANIMATION;
+			vRenderTickAnimation = TICK_ANIMATION_FRAME;
 			vRenderStartAnimation = true;
 		}
 	}
