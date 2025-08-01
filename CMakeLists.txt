@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.3)
-project(Memory)
+cmake_minimum_required(VERSION 3.13)
+project(Memory C)
 
-set(CMAKE_C_STANDARD 11) # Requires C11 standard
+set(CMAKE_C_STANDARD 11)
 
 # Detect architecture
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -9,7 +9,6 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 else()
     set(ARCH_DIR "x86")
 endif()
-
 message(STATUS "Detected architecture: ${ARCH_DIR}")
 
 # Detect OS and set lib folder accordingly
@@ -20,39 +19,36 @@ elseif(UNIX)
 else()
     message(FATAL_ERROR "Unsupported operating system")
 endif()
-
 message(STATUS "Detected OS folder: ${LIB_OS_DIR}")
 
-# Set include (fixed path) and lib dirs (still per arch)
+# Set include and lib directories
 set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 set(LIB_DIR "${CMAKE_SOURCE_DIR}/lib/${LIB_OS_DIR}/${ARCH_DIR}")
 
 include_directories("${INCLUDE_DIR}")
+link_directories("${LIB_DIR}")
 
+# Source files
 file(GLOB SRC_FILES "${CMAKE_SOURCE_DIR}/src/*.c")
-file(GLOB HEADER_FILES "${CMAKE_SOURCE_DIR}/src/*.h")
 
-add_executable(memory ${SRC_FILES} ${HEADER_FILES})
+add_executable(memory ${SRC_FILES})
 
-source_group("Header Files" FILES ${HEADER_FILES})
-
-target_link_directories(memory PRIVATE "${LIB_DIR}")
-
-# ✅ Link libs
+# Link libraries
 if(WIN32)
-target_link_libraries(memory PRIVATE winmm)
+    target_link_libraries(memory PRIVATE raylib winmm)
+elseif(UNIX)
+    target_link_libraries(memory PRIVATE raylib m dl pthread)
 endif()
-target_link_libraries(memory PRIVATE raylib)
 
-# Output directories
+# Output directory setup
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 if(IS_MULTI_CONFIG)
     set_target_properties(memory PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin/Debug"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/Release"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG       "${CMAKE_SOURCE_DIR}/bin/Debug"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE     "${CMAKE_SOURCE_DIR}/bin/Release"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/bin/RelWithDebInfo"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_SOURCE_DIR}/bin/MinSizeRel"
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL  "${CMAKE_SOURCE_DIR}/bin/MinSizeRel"
     )
 else()
     if(NOT CMAKE_BUILD_TYPE)
@@ -65,6 +61,7 @@ else()
     )
 endif()
 
+# Messages
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Include dir: ${INCLUDE_DIR}")
 message(STATUS "Library dir: ${LIB_DIR}")
