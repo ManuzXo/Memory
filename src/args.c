@@ -39,7 +39,7 @@ ArgsTable_t ArgsTable[] = {
 bool Args_Init(int argc, char* argv[]) {
 	if (argc == 1) return false;
 	bool result = false;
-	for (int i = 1; i < ARGS_COUNT; i++) {
+	for (int i = 1; i < argc; i++) {
 		char* argKey = argv[i];
 		char* argValue = argv[i + 1];
 		if (argKey == NULL) continue;
