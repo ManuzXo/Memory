@@ -24,7 +24,8 @@ extern bool SceneCreatePairsAndShuffle();
 extern void SceneClearBlocks();
 // Inizializza il timer
 extern void SceneInitTimer();
-extern void SceneEndTimer();
+// Termina Timer
+extern void SceneResetVariable();
 // Ritorna il tempo trascorso dall'inizio del round
 extern char* SceneGetTimerText();
 // Controlla se tutti i blocchi sono stati completati

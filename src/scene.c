@@ -77,7 +77,8 @@ void SceneInitTimer() {
 	vSceneTimerStarted = true;
 	vSceneStartGameTimer = GetTime();
 }
-void SceneEndTimer() {
+void SceneResetVariable() {
+	vSceneCorrectBlocksCount = 0;
 	vSceneTimerStarted = false;
 }
 char* SceneGetTimerText() {

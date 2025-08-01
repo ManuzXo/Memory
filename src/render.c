@@ -58,6 +58,7 @@ inline void RenderMainLogic() {
 	{
 		if (!vSceneTimerStarted)
 			SceneInitTimer();
+
 		vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
 
 		RenderUpdateBlocksGrids(SceneMaxRow, SceneMaxCol);
@@ -255,7 +256,7 @@ void RenderInfo() {
 }
 
 void RenderBtnCallbackGridSize(int maxRow, int maxCol) {
-	SceneEndTimer();
+	SceneResetVariable();
 	SceneInit(maxRow, maxCol);
 }
 
