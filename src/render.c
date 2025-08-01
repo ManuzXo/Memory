@@ -9,7 +9,8 @@
 #define BACKGROUND_COLOR RAYWHITE
 #define PADDING_RATIO 0.30f  // 30% padding totale (15% per lato)
 #define SPACING_RATIO 0.01f  // 1% dello schermo come spacing
-#define TICK_ANIMATION 30
+#define TICK_ANIMATION 30  // 30 tick per l'animazione di ripristino
+
 
 unsigned int vRenderMonitor = 0;
 unsigned int vRenderFps = 60;
@@ -122,16 +123,17 @@ void RenderBlock(GridBlock_t* block) {
 }
 void RenderSelectBlock(GridBlock_t* block) {
 	if (block->done == false) {
+		//resetta l'animazione se è rimasta appesa
+		vRenderStartAnimation = false;
 
 		if (vRenderBlockPickedCount == 2) {
 			RenderRestoreChoosedBlocks();
 		}
 
+		block->color = BLOCK_COLOR_PICKED;
 		*(&vRenderBlockChoosed[vRenderBlockPickedCount]) = block;
 		vRenderBlockPickedCount++;
 
-		//resetta l'animazione se è rimasta appesa
-		vRenderStartAnimation = false;
 	}
 }
 void RenderDrawAndCheckResultBlocks() {
@@ -146,8 +148,8 @@ void RenderDrawAndCheckResultBlocks() {
 		{
 			vRenderBlockChoosed[0]->done = true;
 			vRenderBlockChoosed[1]->done = true;
-			vRenderBlockChoosed[0]->color = GREEN;
-			vRenderBlockChoosed[1]->color = GREEN;
+			vRenderBlockChoosed[0]->color = BLOCK_COLOE_DONE;
+			vRenderBlockChoosed[1]->color = BLOCK_COLOE_DONE;
 		}
 		else if (!vRenderStartAnimation)
 		{
@@ -166,6 +168,10 @@ void RenderCheckAnimation() {
 	}
 }
 void RenderRestoreChoosedBlocks() {
+	if (!vRenderBlockChoosed[0]->done && !vRenderBlockChoosed[1]->done) {
+		vRenderBlockChoosed[0]->color = BLOCK_COLOR_DEFAULT;
+		vRenderBlockChoosed[1]->color = BLOCK_COLOR_DEFAULT;
+	}
 	vRenderBlockPickedCount = 0;
 	vRenderBlockChoosed[0] = NULL;
 	vRenderBlockChoosed[1] = NULL;

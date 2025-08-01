@@ -45,7 +45,7 @@ bool SceneCreatePairsAndShuffle() {
 		SceneGridBlocks[i].y = 0;
 		SceneGridBlocks[i].width = 0;
 		SceneGridBlocks[i].height = 0;
-		SceneGridBlocks[i].color = GRAY;
+		SceneGridBlocks[i].color = BLOCK_COLOR_DEFAULT;
 		SceneGridBlocks[i].done = false;
 	}
 	srand((unsigned int)time(NULL));
