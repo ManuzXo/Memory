@@ -15,9 +15,11 @@ bool vSceneTimerStarted = false;
 double vSceneStartGameTimer = 0, vSceneLastGameTimer = 0;
 
 bool SceneInit(unsigned int maxRow, unsigned int maxCol) {
+	SceneClearBlocks();
+	SceneResetVariable();
+
 	if (maxRow <= 0 || maxCol <= 0)
 		return false;
-	SceneClearBlocks();
 	SceneMaxRow = maxRow;
 	SceneMaxCol = maxCol;
 	SceneBlockCount = SceneMaxRow * SceneMaxCol;
@@ -25,6 +27,7 @@ bool SceneInit(unsigned int maxRow, unsigned int maxCol) {
 		printf("Attenzione: la griglia non ha un numero pari di blocchi\n");
 		return false;
 	}
+	SceneInitTimer();
 	return SceneCreatePairsAndShuffle();
 }
 void SwapBlocks(GridBlock_t* a, GridBlock_t* b) {

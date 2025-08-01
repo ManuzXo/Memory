@@ -56,9 +56,6 @@ inline void RenderMainLogic() {
 	}
 	else
 	{
-		if (!vSceneTimerStarted)
-			SceneInitTimer();
-
 		vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
 
 		RenderUpdateBlocksGrids(SceneMaxRow, SceneMaxCol);
@@ -247,19 +244,13 @@ void RenderInfo() {
 	GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(WHITE));
 	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(LIME));
 	if (GuiButton((Rectangle) { xBtn - btnSize - 10, yBtn, btnSize, btnSize }, "+") == 1) {
-		RenderBtnCallbackGridSize(SceneMaxRow + 2, SceneMaxCol + 2);
+		SceneInit(SceneMaxRow + 2, SceneMaxCol + 2);
 	}
 	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(RED));
 	if (GuiButton((Rectangle) { xBtn, yBtn, btnSize, btnSize }, "-") == 1) {
-		RenderBtnCallbackGridSize(SceneMaxRow - 2, SceneMaxCol - 2);
+		SceneInit(SceneMaxRow - 2, SceneMaxCol - 2);
 	}
 }
-
-void RenderBtnCallbackGridSize(int maxRow, int maxCol) {
-	SceneResetVariable();
-	SceneInit(maxRow, maxCol);
-}
-
 void RenderClear() {
 	CloseWindow();
 }

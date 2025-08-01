@@ -51,7 +51,6 @@ extern bool RenderMouseIsHoverBlock(GridBlock_t* block);
 extern void RenderDrawBlockNumber(GridBlock_t* block);
 //Fa il draw di informazioni generali come FPS
 extern void RenderInfo();
-extern void RenderBtnCallbackGridSize(int maxRow, int maxCol);
 //Pulisce il render, chiude la finestra e rilascia le risorse
 extern void RenderClear();
 #endif // !_RENDER_
