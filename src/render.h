@@ -4,16 +4,20 @@
 #include <stdbool.h>
 #include "struct.h"
 
+// -- GRAPHICS STUFF --
 extern unsigned int vRenderMonitor;
 extern unsigned int vRenderFps;
 extern bool vRenderFullscreen;
 extern bool vRenderExit;
 extern MouseCursor vRenderMouseCursor;
 
+// -- GAME BLOCK LOGIC STUFF --
 extern unsigned int vRenderBlockPickedCount;
 extern GridBlock_t* vRenderBlockChoosed[2];
-extern bool vRenderStartAnimationClearChoosedBlock;
+extern bool vRenderStartAnimation;
 extern int vRenderTickAnimation;
+
+// -- METHODS --
 
 //Init del render
 extern void RenderInit();
@@ -27,8 +31,11 @@ extern void RenderUpdateBlocksGrids(int maxRow, int maxCol);
 extern void RenderBlocks();
 //Fa il draw di un singolo blocco, con le coordinate del blocco e la sua dimensione
 extern void RenderBlock(GridBlock_t* block);
+// Seleziona un blocco, aggiungendolo all'array dei blocchi scelti
+extern void RenderSelectBlock(GridBlock_t* block);
 // Disegna i blocchi e controlla se sono stati scelti due blocchi uguali
 extern void RenderDrawAndCheckResultBlocks();
+//Se i blocchi selezionati hanno un numero diverso, inizia l'animazione di ripristino blocchi scelti
 extern void RenderCheckAnimation();
 // Ripristina i blocchi scelti, resettando il contatore e le scelte
 extern void RenderRestoreChoosedBlocks();

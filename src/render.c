@@ -9,6 +9,7 @@
 #define BACKGROUND_COLOR RAYWHITE
 #define PADDING_RATIO 0.30f  // 30% padding totale (15% per lato)
 #define SPACING_RATIO 0.01f  // 1% dello schermo come spacing
+#define TICK_ANIMATION 30
 
 unsigned int vRenderMonitor = 0;
 unsigned int vRenderFps = 60;
@@ -18,7 +19,7 @@ MouseCursor vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
 
 unsigned int vRenderBlockPickedCount = 0;
 GridBlock_t* vRenderBlockChoosed[2] = { NULL };
-bool vRenderStartAnimationClearChoosedBlock = false;
+bool vRenderStartAnimation = false;
 int vRenderTickAnimation = 0;
 
 void RenderInit() {
@@ -112,24 +113,27 @@ void RenderBlocks() {
 }
 
 void RenderBlock(GridBlock_t* block) {
-	bool isDone = block->done;
 	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(block->color));
 	if (GuiButton((Rectangle) { block->x, block->y, block->width, block->height }, NULL) == 1) {
-		if (isDone == false) {
-			if (vRenderBlockPickedCount == 2) {
-				RenderRestoreChoosedBlocks();
-			}
-			*(&vRenderBlockChoosed[vRenderBlockPickedCount]) = block;
-			vRenderBlockPickedCount++;
-
-			//resetta l'animazione se è rimasta appesa
-			vRenderStartAnimationClearChoosedBlock = false;
-		}
+		RenderSelectBlock(block);
 	}
-	if (isDone == true)
+	if (block->done)
 		RenderDrawBlockNumber(block);
 }
+void RenderSelectBlock(GridBlock_t* block) {
+	if (block->done == false) {
 
+		if (vRenderBlockPickedCount == 2) {
+			RenderRestoreChoosedBlocks();
+		}
+
+		*(&vRenderBlockChoosed[vRenderBlockPickedCount]) = block;
+		vRenderBlockPickedCount++;
+
+		//resetta l'animazione se è rimasta appesa
+		vRenderStartAnimation = false;
+	}
+}
 void RenderDrawAndCheckResultBlocks() {
 
 	for (int i = 0; i < vRenderBlockPickedCount; i++) {
@@ -145,18 +149,18 @@ void RenderDrawAndCheckResultBlocks() {
 			vRenderBlockChoosed[0]->color = GREEN;
 			vRenderBlockChoosed[1]->color = GREEN;
 		}
-		else if (!vRenderStartAnimationClearChoosedBlock)
+		else if (!vRenderStartAnimation)
 		{
-			vRenderTickAnimation = 50;
-			vRenderStartAnimationClearChoosedBlock = true;
+			vRenderTickAnimation = TICK_ANIMATION;
+			vRenderStartAnimation = true;
 		}
 	}
 }
 void RenderCheckAnimation() {
-	if (vRenderStartAnimationClearChoosedBlock) {
-		if (vRenderTickAnimation <= 0) {
+	if (vRenderStartAnimation) {
+		if (vRenderTickAnimation < 0) {
 			RenderRestoreChoosedBlocks();
-			vRenderStartAnimationClearChoosedBlock = false;
+			vRenderStartAnimation = false;
 		}
 		vRenderTickAnimation--;
 	}
@@ -168,10 +172,8 @@ void RenderRestoreChoosedBlocks() {
 }
 
 void RenderCheckAndSetMousePointingHand(GridBlock_t* block) {
-	if (RenderMouseIsHoverBlock(block)) {
-		if (vRenderMouseCursor == MOUSE_CURSOR_DEFAULT) {
-			vRenderMouseCursor = MOUSE_CURSOR_POINTING_HAND;
-		}
+	if (RenderMouseIsHoverBlock(block) && vRenderMouseCursor == MOUSE_CURSOR_DEFAULT) {
+		vRenderMouseCursor = MOUSE_CURSOR_POINTING_HAND;
 	}
 }
 void RenderDrawBlockNumber(GridBlock_t* block) {
