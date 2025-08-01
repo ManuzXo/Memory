@@ -89,15 +89,15 @@ void RenderUpdateBlocksGrids(int maxRow, int maxCol) {
 				printf("l'index block locale (%i) supera i blocchi totali (%i)\n", blockIndex, SceneBlockCount);
 				return;
 			}
-			GridBlock_t* currentBlock = &SceneGridBlocks[blockIndex];
-			if (currentBlock == NULL) {
+			GridBlock_t* block = &SceneGridBlocks[blockIndex];
+			if (block == NULL) {
 				printf("Il blocco corrente è NULL, index: %i\n", blockIndex);
 				return;
 			}
-			currentBlock->x = xBlock;
-			currentBlock->y = yBlock;
-			currentBlock->width = blockWidth;
-			currentBlock->height = blockHeight;
+			block->x = xBlock;
+			block->y = yBlock;
+			block->width = blockWidth;
+			block->height = blockHeight;
 			blockIndex++;
 		}
 	}
