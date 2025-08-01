@@ -16,6 +16,11 @@ bool vRenderFullscreen = false;
 bool vRenderExit = false;
 MouseCursor vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
 
+unsigned int vRenderBlockPickedCount = 0;
+GridBlock_t* vRenderBlockChoosed[2] = { NULL };
+bool vRenderStartAnimationClearChoosedBlock = false;
+int vRenderTickAnimation = 0;
+
 void RenderInit() {
 	RenderSetWindowState();
 	RenderLoop();
@@ -40,12 +45,15 @@ void RenderLoop() {
 		vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
 		RenderUpdateBlocksGrids(SceneMaxRow, SceneMaxCol);
 		RenderBlocks();
+		RenderDrawAndCheckResultBlocks();
+		RenderCheckAnimation();
 		RenderInfo();
 		SetMouseCursor(vRenderMouseCursor);
-		
+
 		EndDrawing();
 	}
 }
+
 void RenderUpdateBlocksGrids(int maxRow, int maxCol) {
 	int screenWidth = GetScreenWidth();
 	int screenHeight = GetScreenHeight();
@@ -93,25 +101,79 @@ void RenderUpdateBlocksGrids(int maxRow, int maxCol) {
 }
 void RenderBlocks() {
 	for (int i = 0; i < SceneBlockCount; i++) {
-		GridBlock_t* currentBlock = &SceneGridBlocks[i];
-		if (currentBlock == NULL) {
+		GridBlock_t* block = &SceneGridBlocks[i];
+		if (block == NULL) {
 			printf("Il blocco corrente è NULL, index: %i\n", i);
 			return;
 		}
-		RenderBlock(currentBlock);
+		RenderBlock(block);
+		RenderCheckAndSetMousePointingHand(block);
 	}
 }
 
 void RenderBlock(GridBlock_t* block) {
-	DrawRectangle(block->x, block->y, block->width, block->height, GRAY);
+	bool isDone = block->done;
+	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(block->color));
+	if (GuiButton((Rectangle) { block->x, block->y, block->width, block->height }, NULL) == 1) {
+		if (isDone == false) {
+			if (vRenderBlockPickedCount == 2) {
+				RenderRestoreChoosedBlocks();
+			}
+			*(&vRenderBlockChoosed[vRenderBlockPickedCount]) = block;
+			vRenderBlockPickedCount++;
+
+			//resetta l'animazione se è rimasta appesa
+			vRenderStartAnimationClearChoosedBlock = false;
+		}
+	}
+	if (isDone == true)
+		RenderDrawBlockNumber(block);
+}
+
+void RenderDrawAndCheckResultBlocks() {
+
+	for (int i = 0; i < vRenderBlockPickedCount; i++) {
+		RenderDrawBlockNumber(vRenderBlockChoosed[i]);
+	}
+
+	if (vRenderBlockPickedCount == 2)
+	{
+		if (vRenderBlockChoosed[0]->number == vRenderBlockChoosed[1]->number)
+		{
+			vRenderBlockChoosed[0]->done = true;
+			vRenderBlockChoosed[1]->done = true;
+			vRenderBlockChoosed[0]->color = GREEN;
+			vRenderBlockChoosed[1]->color = GREEN;
+		}
+		else if (!vRenderStartAnimationClearChoosedBlock)
+		{
+			vRenderTickAnimation = 50;
+			vRenderStartAnimationClearChoosedBlock = true;
+		}
+	}
+}
+void RenderCheckAnimation() {
+	if (vRenderStartAnimationClearChoosedBlock) {
+		if (vRenderTickAnimation <= 0) {
+			RenderRestoreChoosedBlocks();
+			vRenderStartAnimationClearChoosedBlock = false;
+		}
+		vRenderTickAnimation--;
+	}
+}
+void RenderRestoreChoosedBlocks() {
+	vRenderBlockPickedCount = 0;
+	vRenderBlockChoosed[0] = NULL;
+	vRenderBlockChoosed[1] = NULL;
+}
+
+void RenderCheckAndSetMousePointingHand(GridBlock_t* block) {
 	if (RenderMouseIsHoverBlock(block)) {
 		if (vRenderMouseCursor == MOUSE_CURSOR_DEFAULT) {
 			vRenderMouseCursor = MOUSE_CURSOR_POINTING_HAND;
 		}
-		RenderDrawBlockNumber(block);
 	}
 }
-
 void RenderDrawBlockNumber(GridBlock_t* block) {
 	char* numberText = TextFormat("%i", block->number);
 	int textWidth = MeasureText(numberText, 20);
@@ -133,8 +195,8 @@ void RenderInfo() {
 
 	int base = GetScreenWidth() > GetScreenHeight() ? GetScreenWidth() : GetScreenHeight();
 	int fontSize = (int)(base * 0.015f);
-	
-	char *infoTxt = TextFormat("FPS (%d) | Grid Size (%ix%i)", GetFPS(), SceneMaxRow, SceneMaxCol);
+
+	char* infoTxt = TextFormat("FPS (%d) | Grid Size (%ix%i)", GetFPS(), SceneMaxRow, SceneMaxCol);
 	DrawText(infoTxt, 15, 15, fontSize, BLACK);
 
 	GuiSliderBar((Rectangle) { 15 + MeasureText(infoTxt, fontSize) + 20, 15, 200, fontSize + 10 }, "", NULL, & slider, 0, 100);

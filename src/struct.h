@@ -9,5 +9,7 @@ typedef struct {
 	int width;
 	int height;
 	int number;
+	Color color;
+	bool done;
 }GridBlock_t;
 #endif // !_STRUCT_

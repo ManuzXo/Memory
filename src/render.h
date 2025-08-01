@@ -10,6 +10,10 @@ extern bool vRenderFullscreen;
 extern bool vRenderExit;
 extern MouseCursor vRenderMouseCursor;
 
+extern unsigned int vRenderBlockPickedCount;
+extern GridBlock_t* vRenderBlockChoosed[2];
+extern bool vRenderStartAnimationClearChoosedBlock;
+extern int vRenderTickAnimation;
 
 //Init del render
 extern void RenderInit();
@@ -23,6 +27,13 @@ extern void RenderUpdateBlocksGrids(int maxRow, int maxCol);
 extern void RenderBlocks();
 //Fa il draw di un singolo blocco, con le coordinate del blocco e la sua dimensione
 extern void RenderBlock(GridBlock_t* block);
+// Disegna i blocchi e controlla se sono stati scelti due blocchi uguali
+extern void RenderDrawAndCheckResultBlocks();
+extern void RenderCheckAnimation();
+// Ripristina i blocchi scelti, resettando il contatore e le scelte
+extern void RenderRestoreChoosedBlocks();
+//Controlla se il mouse è sopra un blocco specifico e lo evidenzia, con le coordinate del blocco e la sua dimensione
+extern void RenderCheckAndSetMousePointingHand(GridBlock_t* block);
 // Controlla se il mouse è sopra un blocco specifico, con le coordinate del blocco e la sua dimensione
 extern bool RenderMouseIsHoverBlock(GridBlock_t* block);
 //Disegna il numero del blocco, con le coordinate del blocco e la sua dimensione
