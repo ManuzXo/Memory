@@ -9,6 +9,11 @@ GridBlock_t* SceneGridBlocks = NULL;
 unsigned int SceneBlockCount = 0;
 unsigned int SceneMaxRow = 0, SceneMaxCol = 0;
 
+bool vSceneInitialDraw = false;
+unsigned int vSceneCorrectBlocksCount = 0;
+bool vSceneTimerStarted = false;
+double vSceneStartGameTimer = 0, vSceneLastGameTimer = 0;
+
 bool SceneInit(unsigned int maxRow, unsigned int maxCol) {
 	if (maxRow <= 0 || maxCol <= 0)
 		return false;
@@ -67,4 +72,28 @@ void SceneClearBlocks() {
 	printf("Clearing %u blocks\n", SceneBlockCount);
 	free(SceneGridBlocks);
 	SceneBlockCount = 0;
+}
+void SceneInitTimer() {
+	vSceneTimerStarted = true;
+	vSceneStartGameTimer = GetTime();
+}
+void SceneEndTimer() {
+	vSceneTimerStarted = false;
+}
+char* SceneGetTimerText() {
+	if (!SceneIsRoundWinned())
+		vSceneLastGameTimer = GetTime();
+
+	double elapsed = vSceneLastGameTimer - vSceneStartGameTimer;
+	int seconds = (int)elapsed % 60;
+	int minutes = ((int)elapsed / 60) % 60;
+	int hours = (int)elapsed / 3600;
+
+	static char timerText[64];
+	sprintf(timerText, "%02d:%02d:%02d", hours, minutes, seconds);
+	return timerText;
+}
+
+bool SceneIsRoundWinned() {
+	return vSceneCorrectBlocksCount == SceneBlockCount;
 }

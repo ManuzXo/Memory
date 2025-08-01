@@ -4,7 +4,7 @@
 #include "raylib/raylib.h"
 
 #define BLOCK_COLOR_PICKED LIGHTGRAY
-#define BLOCK_COLOE_DONE GREEN
+#define BLOCK_COLOR_DONE GREEN
 #define BLOCK_COLOR_DEFAULT GRAY
 
 typedef struct {

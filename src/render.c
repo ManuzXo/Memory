@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include "raylib/raylib.h"
 #define RAYGUI_IMPLEMENTATION
+#define RAYGUI_SUPPORT_ICONS 
+#include "raylib/raylib.h"
 #include "raylib/raygui.h"
 
 #include "scene.h"
@@ -40,21 +41,39 @@ void RenderSetWindowState() {
 	SetTargetFPS(vRenderFps);
 }
 void RenderLoop() {
-	while (!WindowShouldClose() && !vRenderExit)
-	{
+	while (!WindowShouldClose() && !vRenderExit) {
 		BeginDrawing();
 		ClearBackground(BACKGROUND_COLOR);
+		RenderMainLogic();
+		EndDrawing();
+	}
+}
 
+inline void RenderMainLogic() {
+	if (!vSceneInitialDraw)
+	{
+		RenderDrawStartAnimation();
+	}
+	else
+	{
+		if (!vSceneTimerStarted)
+			SceneInitTimer();
 		vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
+
 		RenderUpdateBlocksGrids(SceneMaxRow, SceneMaxCol);
 		RenderBlocks();
 		RenderCheckResultBlocks();
-		RenderCheckAnimation();
+		RenderCheckAnimationChoosedBlockRestore();
+
 		RenderInfo();
 		SetMouseCursor(vRenderMouseCursor);
-
-		EndDrawing();
 	}
+}
+void RenderDrawStartAnimation() {
+	const char* text = "Press any key to Start!";
+	SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+	DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 20) / 2, GetScreenHeight() / 2 - 10, 20, BLACK);
+	vSceneInitialDraw = GetKeyPressed() > 0;
 }
 
 void RenderUpdateBlocksGrids(int maxRow, int maxCol) {
@@ -116,8 +135,13 @@ void RenderBlocks() {
 
 void RenderBlock(GridBlock_t* block) {
 	GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
-	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(block->color));
+	GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(BLACK));
+	GuiSetStyle(BUTTON, TEXT_COLOR_FOCUSED, ColorToInt(BLACK));
+	GuiSetStyle(BUTTON, TEXT_COLOR_PRESSED, ColorToInt(BLACK));
 
+	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(block->color));
+	GuiSetStyle(BUTTON, BASE_COLOR_FOCUSED, ColorToInt(block->color));
+	GuiSetStyle(BUTTON, BASE_COLOR_PRESSED, ColorToInt(block->color));
 	char* numberTxt = NULL;
 	if (block->picked || block->done) numberTxt = TextFormat("%i", block->number);
 	if (GuiButton((Rectangle) { block->x, block->y, block->width, block->height }, numberTxt) == 1) {
@@ -126,12 +150,8 @@ void RenderBlock(GridBlock_t* block) {
 }
 void RenderSelectBlock(GridBlock_t* block) {
 	if (block->done == false) {
-		//resetta l'animazione se è rimasta appesa
-		vRenderStartAnimation = false;
-
-		if (vRenderBlockPickedCount == 2) {
+		if (vRenderBlockPickedCount == 2)
 			RenderRestoreChoosedBlocks();
-		}
 
 		block->color = BLOCK_COLOR_PICKED;
 		block->picked = true;
@@ -147,8 +167,10 @@ void RenderCheckResultBlocks() {
 		{
 			vRenderBlockChoosed[0]->done = true;
 			vRenderBlockChoosed[1]->done = true;
-			vRenderBlockChoosed[0]->color = BLOCK_COLOE_DONE;
-			vRenderBlockChoosed[1]->color = BLOCK_COLOE_DONE;
+			vRenderBlockChoosed[0]->color = BLOCK_COLOR_DONE;
+			vRenderBlockChoosed[1]->color = BLOCK_COLOR_DONE;
+			RenderRestoreChoosedBlocks();
+			vSceneCorrectBlocksCount += 2;
 		}
 		else if (!vRenderStartAnimation)
 		{
@@ -157,11 +179,10 @@ void RenderCheckResultBlocks() {
 		}
 	}
 }
-void RenderCheckAnimation() {
+void RenderCheckAnimationChoosedBlockRestore() {
 	if (vRenderStartAnimation) {
 		if (vRenderTickAnimation < 0) {
 			RenderRestoreChoosedBlocks();
-			vRenderStartAnimation = false;
 		}
 		vRenderTickAnimation--;
 	}
@@ -176,6 +197,9 @@ void RenderRestoreChoosedBlocks() {
 	vRenderBlockPickedCount = 0;
 	vRenderBlockChoosed[0] = NULL;
 	vRenderBlockChoosed[1] = NULL;
+
+	//resetta l'animazione se è rimasta appesa
+	vRenderStartAnimation = false;
 }
 
 void RenderCheckAndSetMousePointingHand(GridBlock_t* block) {
@@ -209,18 +233,30 @@ void RenderInfo() {
 	char* infoTxt = TextFormat("FPS (%d) | Grid Size (%ix%i)", GetFPS(), SceneMaxRow, SceneMaxCol);
 	DrawText(infoTxt, padding, 15, fontSize, BLACK);
 
+
+	char* timerTxt = GuiIconText(ICON_SAND_TIMER, SceneGetTimerText());
+	int timetTxtSize = MeasureText(timerTxt, 20);
+	GuiDrawText(timerTxt, (Rectangle) { GetScreenWidth() - timetTxtSize, 10, timetTxtSize, 20 }, 0, BLACK);
+
+
 	int btnSize = 30;
 	int xBtn = GetScreenWidth() - padding - btnSize;
 	int yBtn = GetScreenHeight() - padding - btnSize;
+	GuiLoadStyleDefault();
 	GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(WHITE));
 	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(LIME));
-	if (GuiButton((Rectangle) { xBtn - btnSize - 10, yBtn, btnSize, btnSize}, "+") == 1) {
-		SceneInit(SceneMaxRow + 2, SceneMaxCol + 2);
+	if (GuiButton((Rectangle) { xBtn - btnSize - 10, yBtn, btnSize, btnSize }, "+") == 1) {
+		RenderBtnCallbackGridSize(SceneMaxRow + 2, SceneMaxCol + 2);
 	}
 	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(RED));
 	if (GuiButton((Rectangle) { xBtn, yBtn, btnSize, btnSize }, "-") == 1) {
-		SceneInit(SceneMaxRow - 2, SceneMaxCol - 2);
+		RenderBtnCallbackGridSize(SceneMaxRow - 2, SceneMaxCol - 2);
 	}
+}
+
+void RenderBtnCallbackGridSize(int maxRow, int maxCol) {
+	SceneEndTimer();
+	SceneInit(maxRow, maxCol);
 }
 
 void RenderClear() {
