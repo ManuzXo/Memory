@@ -17,4 +17,6 @@ typedef struct {
 	Color color;
 	bool done;
 }GridBlock_t;
+
+
 #endif // !_STRUCT_
