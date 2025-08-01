@@ -204,11 +204,23 @@ void RenderInfo() {
 
 	int base = GetScreenWidth() > GetScreenHeight() ? GetScreenWidth() : GetScreenHeight();
 	int fontSize = (int)(base * 0.015f);
+	int padding = 15;
 
 	char* infoTxt = TextFormat("FPS (%d) | Grid Size (%ix%i)", GetFPS(), SceneMaxRow, SceneMaxCol);
-	DrawText(infoTxt, 15, 15, fontSize, BLACK);
+	DrawText(infoTxt, padding, 15, fontSize, BLACK);
 
-	GuiSliderBar((Rectangle) { 15 + MeasureText(infoTxt, fontSize) + 20, 15, 200, fontSize + 10 }, "", NULL, & slider, 0, 100);
+	int btnSize = 30;
+	int xBtn = GetScreenWidth() - padding - btnSize;
+	int yBtn = GetScreenHeight() - padding - btnSize;
+	GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(WHITE));
+	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(LIME));
+	if (GuiButton((Rectangle) { xBtn - btnSize - 10, yBtn, btnSize, btnSize}, "+") == 1) {
+		SceneInit(SceneMaxRow + 2, SceneMaxCol + 2);
+	}
+	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(RED));
+	if (GuiButton((Rectangle) { xBtn, yBtn, btnSize, btnSize }, "-") == 1) {
+		SceneInit(SceneMaxRow - 2, SceneMaxCol - 2);
+	}
 }
 
 void RenderClear() {

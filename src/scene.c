@@ -10,6 +10,8 @@ unsigned int SceneBlockCount = 0;
 unsigned int SceneMaxRow = 0, SceneMaxCol = 0;
 
 bool SceneInit(unsigned int maxRow, unsigned int maxCol) {
+	if (maxRow <= 0 || maxCol <= 0)
+		return false;
 	SceneClearBlocks();
 	SceneMaxRow = maxRow;
 	SceneMaxCol = maxCol;
@@ -27,7 +29,7 @@ void SwapBlocks(GridBlock_t* a, GridBlock_t* b) {
 }
 
 bool SceneCreatePairsAndShuffle() {
-	SceneGridBlocks = realloc(SceneGridBlocks, sizeof(GridBlock_t) * SceneBlockCount);
+	SceneGridBlocks = malloc(sizeof(GridBlock_t) * SceneBlockCount);
 	if (SceneGridBlocks == NULL) {
 		printf("Memoria insufficiente per allocare i blocchi\n");
 		SceneBlockCount = 0;
