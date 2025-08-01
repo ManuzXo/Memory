@@ -39,7 +39,10 @@ source_group("Header Files" FILES ${HEADER_FILES})
 target_link_directories(memory PRIVATE "${LIB_DIR}")
 
 # ✅ Link libs
-target_link_libraries(memory PRIVATE raylib winmm)
+if(WIN32)
+target_link_libraries(memory PRIVATE winmm)
+endif()
+target_link_libraries(memory PRIVATE raylib)
 
 # Output directories
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
