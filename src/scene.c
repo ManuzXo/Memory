@@ -9,16 +9,16 @@ GridBlock_t* SceneGridBlocks = NULL;
 unsigned int SceneBlockCount = 0;
 unsigned int SceneMaxRow = 0, SceneMaxCol = 0;
 
-void SceneInit(unsigned int maxRow, unsigned int maxCol) {
+bool SceneInit(unsigned int maxRow, unsigned int maxCol) {
 	SceneClearBlocks();
 	SceneMaxRow = maxRow;
 	SceneMaxCol = maxCol;
 	SceneBlockCount = SceneMaxRow * SceneMaxCol;
 	if (SceneBlockCount % 2 != 0) {
 		printf("Attenzione: la griglia non ha un numero pari di blocchi\n");
-		return;
+		return false;
 	}
-	SceneCreatePairsAndShuffle();
+	return SceneCreatePairsAndShuffle();
 }
 void SwapBlocks(GridBlock_t* a, GridBlock_t* b) {
 	GridBlock_t temp = *a;
@@ -47,6 +47,7 @@ bool SceneCreatePairsAndShuffle() {
 		SceneGridBlocks[i].height = 0;
 		SceneGridBlocks[i].color = BLOCK_COLOR_DEFAULT;
 		SceneGridBlocks[i].done = false;
+		SceneGridBlocks[i].picked = false;
 	}
 	srand((unsigned int)time(NULL));
 

@@ -10,7 +10,7 @@ extern unsigned int SceneBlockCount;
 extern unsigned int SceneMaxRow, SceneMaxCol;
 
 // Inizializza la scena con il numero di righe e colonne
-extern void SceneInit(unsigned int maxRow, unsigned int maxCol);
+extern bool SceneInit(unsigned int maxRow, unsigned int maxCol);
 // Scambia due blocchi nella scena
 extern void SwapBlocks(GridBlock_t* a, GridBlock_t* b);
 // Crea coppie di blocchi e li mescola

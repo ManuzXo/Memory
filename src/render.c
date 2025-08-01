@@ -47,7 +47,7 @@ void RenderLoop() {
 		vRenderMouseCursor = MOUSE_CURSOR_DEFAULT;
 		RenderUpdateBlocksGrids(SceneMaxRow, SceneMaxCol);
 		RenderBlocks();
-		RenderDrawAndCheckResultBlocks();
+		RenderCheckResultBlocks();
 		RenderCheckAnimation();
 		RenderInfo();
 		SetMouseCursor(vRenderMouseCursor);
@@ -114,12 +114,14 @@ void RenderBlocks() {
 }
 
 void RenderBlock(GridBlock_t* block) {
+	GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
 	GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(block->color));
-	if (GuiButton((Rectangle) { block->x, block->y, block->width, block->height }, NULL) == 1) {
+
+	char* numberTxt = NULL;
+	if (block->picked || block->done) numberTxt = TextFormat("%i", block->number);
+	if (GuiButton((Rectangle) { block->x, block->y, block->width, block->height }, numberTxt) == 1) {
 		RenderSelectBlock(block);
 	}
-	if (block->done)
-		RenderDrawBlockNumber(block);
 }
 void RenderSelectBlock(GridBlock_t* block) {
 	if (block->done == false) {
@@ -131,17 +133,13 @@ void RenderSelectBlock(GridBlock_t* block) {
 		}
 
 		block->color = BLOCK_COLOR_PICKED;
+		block->picked = true;
 		*(&vRenderBlockChoosed[vRenderBlockPickedCount]) = block;
 		vRenderBlockPickedCount++;
 
 	}
 }
-void RenderDrawAndCheckResultBlocks() {
-
-	for (int i = 0; i < vRenderBlockPickedCount; i++) {
-		RenderDrawBlockNumber(vRenderBlockChoosed[i]);
-	}
-
+void RenderCheckResultBlocks() {
 	if (vRenderBlockPickedCount == 2)
 	{
 		if (vRenderBlockChoosed[0]->number == vRenderBlockChoosed[1]->number)
@@ -171,6 +169,8 @@ void RenderRestoreChoosedBlocks() {
 	if (!vRenderBlockChoosed[0]->done && !vRenderBlockChoosed[1]->done) {
 		vRenderBlockChoosed[0]->color = BLOCK_COLOR_DEFAULT;
 		vRenderBlockChoosed[1]->color = BLOCK_COLOR_DEFAULT;
+		vRenderBlockChoosed[0]->picked = false;
+		vRenderBlockChoosed[1]->picked = false;
 	}
 	vRenderBlockPickedCount = 0;
 	vRenderBlockChoosed[0] = NULL;

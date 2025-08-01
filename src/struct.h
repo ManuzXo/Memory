@@ -16,6 +16,7 @@ typedef struct {
 	int number;
 	Color color;
 	bool done;
+	bool picked;
 }GridBlock_t;
 
 

@@ -34,7 +34,7 @@ extern void RenderBlock(GridBlock_t* block);
 // Seleziona un blocco, aggiungendolo all'array dei blocchi scelti
 extern void RenderSelectBlock(GridBlock_t* block);
 // Disegna i blocchi e controlla se sono stati scelti due blocchi uguali
-extern void RenderDrawAndCheckResultBlocks();
+extern void RenderCheckResultBlocks();
 //Se i blocchi selezionati hanno un numero diverso, inizia l'animazione di ripristino blocchi scelti
 extern void RenderCheckAnimation();
 // Ripristina i blocchi scelti, resettando il contatore e le scelte
