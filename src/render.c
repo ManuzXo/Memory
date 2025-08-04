@@ -147,14 +147,13 @@ void RenderBlock(GridBlock_t* block) {
 	}
 }
 void RenderSelectBlock(GridBlock_t* block) {
-	if (block->done == false) {
-		if (RenderClickedTwoBlocks()) RenderRestoreChoosedBlocks();
-		block->color = BLOCK_COLOR_PICKED;
-		block->picked = true;
-		*(&vRenderBlockChoosed[vRenderBlockPickedCount]) = block;
-		vRenderBlockPickedCount++;
+	if (block->done) return;
+	if (RenderClickedTwoBlocks()) RenderRestoreChoosedBlocks();
 
-	}
+	block->color = BLOCK_COLOR_PICKED;
+	block->picked = true;
+	*(&vRenderBlockChoosed[vRenderBlockPickedCount]) = block;
+	vRenderBlockPickedCount++;
 }
 void RenderCheckResultBlocks() {
 	if (!RenderClickedTwoBlocks()) return;
