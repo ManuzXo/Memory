@@ -148,9 +148,7 @@ void RenderBlock(GridBlock_t* block) {
 }
 void RenderSelectBlock(GridBlock_t* block) {
 	if (block->done == false) {
-		if (vRenderBlockPickedCount == 2)
-			RenderRestoreChoosedBlocks();
-
+		if (RenderClickedTwoBlocks()) RenderRestoreChoosedBlocks();
 		block->color = BLOCK_COLOR_PICKED;
 		block->picked = true;
 		*(&vRenderBlockChoosed[vRenderBlockPickedCount]) = block;
@@ -159,31 +157,30 @@ void RenderSelectBlock(GridBlock_t* block) {
 	}
 }
 void RenderCheckResultBlocks() {
-	if (vRenderBlockPickedCount == 2)
+	if (!RenderClickedTwoBlocks()) return;
+
+	if (vRenderBlockChoosed[0]->number == vRenderBlockChoosed[1]->number)
 	{
-		if (vRenderBlockChoosed[0]->number == vRenderBlockChoosed[1]->number)
-		{
-			vRenderBlockChoosed[0]->done = true;
-			vRenderBlockChoosed[1]->done = true;
-			vRenderBlockChoosed[0]->color = BLOCK_COLOR_DONE;
-			vRenderBlockChoosed[1]->color = BLOCK_COLOR_DONE;
-			RenderRestoreChoosedBlocks();
-			vSceneCorrectBlocksCount += 2;
-		}
-		else if (!vRenderStartAnimation)
-		{
-			vRenderTickAnimation = TICK_ANIMATION_FRAME;
-			vRenderStartAnimation = true;
-		}
+		vRenderBlockChoosed[0]->done = true;
+		vRenderBlockChoosed[1]->done = true;
+		vRenderBlockChoosed[0]->color = BLOCK_COLOR_DONE;
+		vRenderBlockChoosed[1]->color = BLOCK_COLOR_DONE;
+		RenderRestoreChoosedBlocks();
+		vSceneCorrectBlocksCount += 2;
+	}
+	else if (!vRenderStartAnimation)
+	{
+		vRenderTickAnimation = TICK_ANIMATION_FRAME;
+		vRenderStartAnimation = true;
 	}
 }
+bool RenderClickedTwoBlocks() {
+	return vRenderBlockPickedCount == 2;
+}
 void RenderCheckAnimationChoosedBlockRestore() {
-	if (vRenderStartAnimation) {
-		if (vRenderTickAnimation < 0) {
-			RenderRestoreChoosedBlocks();
-		}
-		vRenderTickAnimation--;
-	}
+	if (!vRenderStartAnimation) return;
+	if (vRenderTickAnimation < 0) RenderRestoreChoosedBlocks();
+	vRenderTickAnimation--;
 }
 void RenderRestoreChoosedBlocks() {
 	if (!vRenderBlockChoosed[0]->done && !vRenderBlockChoosed[1]->done) {
@@ -201,9 +198,7 @@ void RenderRestoreChoosedBlocks() {
 }
 
 void RenderCheckAndSetMousePointingHand(GridBlock_t* block) {
-	if (RenderMouseIsHoverBlock(block) && vRenderMouseCursor == MOUSE_CURSOR_DEFAULT) {
-		vRenderMouseCursor = MOUSE_CURSOR_POINTING_HAND;
-	}
+	if (RenderMouseIsHoverBlock(block) && vRenderMouseCursor == MOUSE_CURSOR_DEFAULT) vRenderMouseCursor = MOUSE_CURSOR_POINTING_HAND;
 }
 void RenderDrawBlockNumber(GridBlock_t* block) {
 	char* numberText = TextFormat("%i", block->number);
